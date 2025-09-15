@@ -2,7 +2,7 @@ altair
 pandas
 streamlit
 google-genai
-faiss-gpu
+faiss
 sentence_transformers
 tqdm
 pandas
