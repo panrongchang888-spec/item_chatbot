@@ -2,3 +2,8 @@ altair
 pandas
 streamlit
 google-genai
+faiss-gpu
+sentence_transformers
+tqdm
+pandas
+numpy
