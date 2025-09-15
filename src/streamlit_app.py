@@ -44,9 +44,9 @@ from sentence_transformers import SentenceTransformer
 
 def main():
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-    with open('./data/iphone17_data.txt', 'r') as f:
+    with open('/app/src/data/iphone17_data.txt', 'r') as f:
         lines = f.readlines()
-    index_load = faiss.read_index("./data/i17_vector.index")
+    index_load = faiss.read_index("/app/src/data/i17_vector.index")
     st.set_page_config(page_title="商品智能客服", layout="centered")
     st.title("🛒 商品智能问答助手")
 
