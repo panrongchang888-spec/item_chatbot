@@ -7,3 +7,7 @@ sentence_transformers
 tqdm
 pandas
 numpy
+tiktoken
+langchain
+pypdf
+zai-sdk
