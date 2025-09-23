@@ -9,5 +9,6 @@ pandas
 numpy
 tiktoken
 langchain
-pypdf
+pypdf2
+pypdf2
 zai-sdk
