@@ -17,7 +17,7 @@ print("Starting the application...")
 
 # 在庫の商品
 products = []
-for i in os.listdir('./data/item_original_data/'):
+for i in os.listdir('/src/data/item_original_data/'):
     if i.endswith('.txt') or i.endswith('.pdf'):
         products.append(i.split('.')[0])
 
@@ -27,14 +27,14 @@ label_nname = ['機能相談','無間']
 st.sidebar.header("商品ファイルアップロード")
 
 uploaded_file = st.sidebar.file_uploader(
-    "上传商品相关文件 (TXT/PDF)", type=["txt", "pdf"]
+    "ファイルをアップロード (TXT/PDF)", type=["txt", "pdf"]
 )
 
 if uploaded_file and uploaded_file.name.split('.')[0] not in products:
     with st.spinner("ファイルを処理中..."):
         name = uploaded_file.name.split('.')[0]
         products.append(name)
-        with open(f'./data/item_original_data/{uploaded_file.name}', 'wb') as f:
+        with open(f'/src/data/item_original_data/{uploaded_file.name}', 'wb') as f:
             f.write(uploaded_file.getbuffer())
         # テキスト抽出
         if uploaded_file.type == "text/plain":
@@ -48,7 +48,7 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
     st.success("ファイルが正常にアップロードされ、処理されました！")
 
 def chat(user_input,product_name,messages, embed_model):
-
+    # 会話歴史の変数
     if 'messages' not in st.session_state:
         st.session_state['messages'] = []
     if 'intentions' not in st.session_state:
@@ -72,6 +72,7 @@ def chat(user_input,product_name,messages, embed_model):
         st.session_state.intentions.append(intent_label)
         context, indexs, scores = Rag_data_get(user_input,product_name, embed_model)
         print("scores--->",scores)
+        # 意図が機能相談かどうかを再確認
         for i in scores[0]:
             if i > 0.8:
                 intent_label = 0
@@ -125,19 +126,19 @@ def main():
 
     embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     
-    st.set_page_config(page_title="商品智能客服", layout="centered")
+    st.set_page_config(page_title="知能会話", layout="centered")
     st.title("🛒 商品問題助手")
 
     #conn = init_db()
     text = 'Unibodyの筐体。Proにふさわしい鍛え抜かれたボディ。\
         iPhone 17 ProとiPhone 17 Pro Max、登場。史上最もパワフルなiPhoneを生み出すために細部まで徹底的に設計しました。新しいデザインの中心は、熱間鍛造アルミニウムUnibody。この筐体が、パフォーマンス、バッテリー容量、そして耐久性の限界を打ち破りますiPhone 17 Proのカメラシステムには、イノベーションが惜しみなく注ぎ込まれています。その一つが、iPhone史上最高の8倍望遠。最大200mmの焦点距離に相当するこの望遠機能は、次世代のテトラプリズムデザインと56%大きくなったセンサーによって実現しました。'
-    
+    # prompt
     messages = [{"role":"system","content":"あなたは今、人工カスタマーサポートとして振る舞います。ユーザーの質問に対して、\
         私が提供する内容を完全に参考にして人間らしい応答を行ってください。関連する情報がない場合は、\
             「申し訳ございません」と回答してください。"}
             ]
-    # 选择商品
     
+    # 选择商品
     product_name = st.selectbox("商品を選んでください", products)
 
     if product_name:

@@ -20,9 +20,9 @@ def Chat_GLM(messages):
         max_tokens=4096,          # 最大输出 tokens
         temperature=0.6           # 控制输出的随机性
     )
-    print('response--->',response)
+    #print('response--->',response)
     response = response.choices[0].message.content
-    print('response--->',response)
+    #print('response--->',response)
      # 获取完整回复
                 #print(response.choices[0].message)
 
@@ -37,10 +37,14 @@ def Chat_GLM(messages):
 
 # RAGでコンテキスト取得
 def Rag_data_get(user_input,product_name, embed_model):
-    with open(f'./data/index_original_data/{product_name}.json', 'r') as f:
+    # 元データの読み込み
+    with open(f'/src/data/index_original_data/{product_name}.json', 'r') as f:
         json_data = json.load(f)
-    index_load = faiss.read_index(f"./data/index_data/{product_name}.index")
+    # rag用のベクトルデータベースの読み込み
+    index_load = faiss.read_index(f"/src/data/index_data/{product_name}.index")
+    # ユーザークエリのベクトル化と類似度検索
     user_question_emb = embed_model.encode([user_input])
+    # D: score, I: index
     D, I = index_load.search(user_question_emb, k=2)
     print('I--------->',I)
     print('D--------->',D)
