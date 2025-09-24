@@ -35,8 +35,9 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
     with st.spinner("ファイルを処理中..."):
         name = uploaded_file.name.split('.')[0]
         products.append(name)
-        with open(f'/app/temp/{uploaded_file.name}', 'wb') as f:
+        with open(f'/temp/{uploaded_file.name}', 'wb') as f:
             f.write(uploaded_file.getbuffer())
+        uploaded_file.seek(0)
         # テキスト抽出
         if uploaded_file.type == "text/plain":
             text_data = uploaded_file.read().decode("utf-8")
