@@ -18,6 +18,10 @@ short_description: product assistant
 
 <img src="flowchart.png" alt="システムフロー図" width="1000">
 
+以下の図は デモのスクリーショット
+
+<img src="demo.png" alt="システムフロー図" width="1000">
+
 ## 概要
 本プロジェクトは、ユーザーのクエリに基づき、商品関連の質問に対して適切な回答を生成するAIシステムです。  
 意図分類、ベクトル検索（Faiss）、および大規模言語モデル（LLM）を組み合わせることで、効率的かつ正確な情報提供を実現します。  
