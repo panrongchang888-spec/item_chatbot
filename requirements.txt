@@ -2,7 +2,7 @@ altair==5.5.0
 pandas==2.3.2
 streamlit==1.49.1
 google-genai==1.36.0
-faiss-cpu==1.9.0
+faiss-cpu
 sentence_transformers==5.1.0
 tqdm==4.67.1
 numpy==1.26.4
