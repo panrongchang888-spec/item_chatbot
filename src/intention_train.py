@@ -5,7 +5,9 @@ from sentence_transformers import SentenceTransformer
 import json
 from tqdm import *
 from sklearn.metrics import classification_report
+import os
 
+BASE_DIR = os.path.dirname(__file__)
 print("Preparing data...")
 # all-MiniLM-L6-v2
 # sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
@@ -94,7 +96,7 @@ def train(train_loader, valid_loader):
 # 预测
 def predict(text):
     loaded_model = IntentClassifier()
-    loaded_model.load_state_dict(torch.load("intent_model.pt", map_location=device))
+    loaded_model.load_state_dict(torch.load(f"{BASE_DIR}/intent_model.pt", map_location=device))
     loaded_model.eval()
   
     with torch.no_grad():
