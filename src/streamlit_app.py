@@ -8,6 +8,7 @@ from tools import Chat_GLM, Rag_data_get
 import time
 import os
 
+BASE_DIR = os.path.dirname(__file__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -17,7 +18,7 @@ print("Starting the application...")
 
 # 在庫の商品
 products = []
-for i in os.listdir('/src/data/item_original_data/'):
+for i in os.listdir(f'{BASE_DIR}/data/item_original_data/'):
     if i.endswith('.txt') or i.endswith('.pdf'):
         products.append(i.split('.')[0])
 
@@ -34,7 +35,7 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
     with st.spinner("ファイルを処理中..."):
         name = uploaded_file.name.split('.')[0]
         products.append(name)
-        with open(f'/src/data/item_original_data/{uploaded_file.name}', 'wb') as f:
+        with open(f'{BASE_DIR}/data/item_original_data/{uploaded_file.name}', 'wb') as f:
             f.write(uploaded_file.getbuffer())
         # テキスト抽出
         if uploaded_file.type == "text/plain":

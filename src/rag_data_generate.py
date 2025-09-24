@@ -5,7 +5,9 @@ import numpy as np
 import pandas as pd
 from tqdm import *
 import json
+import os
 
+BASE_DIR = os.path.dirname(__file__)
 class DataProcess():
     def __init__(self, text_data,name,token=100):
         self.original_data = text_data
@@ -48,10 +50,10 @@ class DataProcess():
             index.add(np.array(out, dtype=np.float32))
             json_data.append({"index":idx,"text":i,"product":self.file_name})
         # index save
-        faiss.write_index(index, f"./data/index_data/{self.file_name}.index")
+        faiss.write_index(index, f"{BASE_DIR}/data/index_data/{self.file_name}.index")
         print('index saved!')
         # json save
-        with open(f'./data/index_original_data/{self.file_name}.json', 'w') as f:
+        with open(f'{BASE_DIR}/data/index_original_data/{self.file_name}.json', 'w') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
         print('json saved!')
    

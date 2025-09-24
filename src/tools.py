@@ -4,7 +4,7 @@ import torch
 from zai import ZhipuAiClient
 import os
 
-
+BASE_DIR = os.path.dirname(__file__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 api_key = os.environ.get('GLM_API_KEY')
 client = ZhipuAiClient(api_key=api_key)  # 请填写您自己的 API Key
@@ -38,10 +38,10 @@ def Chat_GLM(messages):
 # RAGでコンテキスト取得
 def Rag_data_get(user_input,product_name, embed_model):
     # 元データの読み込み
-    with open(f'/src/data/index_original_data/{product_name}.json', 'r') as f:
+    with open(f'{BASE_DIR}/data/index_original_data/{product_name}.json', 'r') as f:
         json_data = json.load(f)
     # rag用のベクトルデータベースの読み込み
-    index_load = faiss.read_index(f"/src/data/index_data/{product_name}.index")
+    index_load = faiss.read_index(f"{BASE_DIR}/data/index_data/{product_name}.index")
     # ユーザークエリのベクトル化と類似度検索
     user_question_emb = embed_model.encode([user_input])
     # D: score, I: index
