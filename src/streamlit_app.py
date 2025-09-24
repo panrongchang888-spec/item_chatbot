@@ -62,7 +62,7 @@ def chat_init(product_name):
 
 def chat(user_input,product_name,messages, embed_model):
     # 会話歴史の変数]
-    chat_init()
+    chat_init(product_name)
 
     if product_name != st.session_state['last_product_name']:
         st.session_state['messages'] = []

@@ -49,9 +49,9 @@ short_description: product assistant
 ## 実行方法
 
 ローカル環境での実行
-	1.	ChatGLM の API キーを取得する
-	2.	環境変数に設定するか、tools.py 内で指定する
-	3.	以下を実行
+1.	ChatGLM の API キーを取得する
+2.	環境変数に設定するか、tools.py 内で指定する
+3.	以下を実行
 
 streamlit run streamlit_app.py
 
