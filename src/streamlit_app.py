@@ -35,8 +35,8 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
     with st.spinner("ファイルを処理中..."):
         name = uploaded_file.name.split('.')[0]
         products.append(name)
-        with open(f'/tmp/{uploaded_file.name}', 'wb') as f:
-            f.write(uploaded_file.getbuffer())
+        # with open(f'/tmp/{uploaded_file.name}', 'wb') as f:
+        #     f.write(uploaded_file.getbuffer())
         uploaded_file.seek(0)
         # テキスト抽出
         if uploaded_file.type == "text/plain":
@@ -45,8 +45,8 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
             reader = PdfReader(uploaded_file)
             text_data = "\n".join([page.extract_text() for page in reader.pages])
         # データをベクトルデータベースに書き込む
-        data_process = DataProcess(text_data, name)
-        data_process.run()
+        # data_process = DataProcess(text_data, name)
+        # data_process.run()
     st.success("ファイルが正常にアップロードされ、処理されました！")
 
 
