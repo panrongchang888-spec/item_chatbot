@@ -21,7 +21,7 @@ short_description: product assistant
 
 以下の図は、商品の知能助手システムの全体フローを示しています。  
 
-<img src="./src/images/flowchart.png" alt="システムフロー図" width="600">
+<img src="./images/flowchart.png" alt="システムフロー図" width="600">
 
 ## 概要
 本プロジェクトは、ユーザーのクエリに基づき、商品関連の質問に対して適切な回答を生成するAIシステムです。  
