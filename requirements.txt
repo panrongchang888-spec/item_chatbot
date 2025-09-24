@@ -11,4 +11,4 @@ pypdf2==3.0.1
 zai-sdk==0.0.3.6
 datasets==4.1.1
 scikit-learn==1.6.1
-torch==2.2.2
+torch
