@@ -12,9 +12,8 @@ BASE_DIR = os.path.dirname(__file__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
+st.set_page_config(page_title="知能会話", layout="centered")
 print("Starting the application...")
-
 
 # 在庫の商品
 products = []
@@ -142,7 +141,7 @@ def main():
 
     embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     
-    st.set_page_config(page_title="知能会話", layout="centered")
+    
     st.title("🛒 商品問題助手")
 
     #conn = init_db()
