@@ -48,14 +48,28 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
         data_process.run()
     st.success("ファイルが正常にアップロードされ、処理されました！")
 
-def chat(user_input,product_name,messages, embed_model):
-    # 会話歴史の変数
+
+def chat_init(product_name):
     if 'messages' not in st.session_state:
         st.session_state['messages'] = []
     if 'intentions' not in st.session_state:
         st.session_state['intentions'] = []
     if 'rag_data' not in st.session_state:
         st.session_state['rag_data'] = []
+    if 'last_product_name' not in st.session_state:
+        st.session_state['last_product_name'] = product_name
+
+
+def chat(user_input,product_name,messages, embed_model):
+    # 会話歴史の変数]
+    chat_init()
+
+    if product_name != st.session_state['last_product_name']:
+        st.session_state['messages'] = []
+        st.session_state['intentions'] = []
+        st.session_state['rag_data'] = []
+        st.session_state['last_product_name'] = product_name
+
     # 会話履歴の表示
     for msg in st.session_state.messages:
         if msg["role"] == "user":
@@ -140,6 +154,7 @@ def main():
             ]
     
     # 选择商品
+    
     product_name = st.selectbox("商品を選んでください", products)
 
     if product_name:
