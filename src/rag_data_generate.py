@@ -50,11 +50,18 @@ class DataProcess():
             index.add(np.array(out, dtype=np.float32))
             json_data.append({"index":idx,"text":i,"product":self.file_name})
         # index save
-        faiss.write_index(index, f"{BASE_DIR}/data/index_data/{self.file_name}.index")
+        try:
+            faiss.write_index(index, f"{BASE_DIR}/data/index_data/{self.file_name}.index")
+        except:
+            faiss.write_index(index, f"/tmp/{self.file_name}.index")
         print('index saved!')
         # json save
-        with open(f'{BASE_DIR}/data/index_original_data/{self.file_name}.json', 'w') as f:
-            json.dump(json_data, f, ensure_ascii=False, indent=4)
+        try:
+            with open(f'{BASE_DIR}/data/index_original_data/{self.file_name}.json', 'w') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=4)
+        except:
+            with open(f'/tmp/{self.file_name}.json', 'w') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=4)
         print('json saved!')
    
     def run(self):

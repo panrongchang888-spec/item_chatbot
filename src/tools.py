@@ -46,10 +46,10 @@ def Rag_data_get(user_input,product_name, embed_model):
             index_load = faiss.read_index(f"{BASE_DIR}/data/index_data/{product_name}.index")
 
         except:
-            with open(f'/temp/{product_name}.json', 'r') as f:
+            with open(f'/tmp/{product_name}.json', 'r') as f:
                 json_data = json.load(f)
             # rag用のベクトルデータベースの読み込み
-            index_load = faiss.read_index(f"/temp/{product_name}.index")
+            index_load = faiss.read_index(f"/tmp/{product_name}.index")
     except FileNotFoundError:
         return "指定された商品データが見つかりません。別の商品を選択するか、商品データをアップロードしてください。", [], []
     # rag用のベクトルデータベースの読み込み
