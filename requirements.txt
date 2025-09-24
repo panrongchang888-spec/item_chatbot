@@ -12,3 +12,6 @@ langchain
 pypdf2
 pypdf2
 zai-sdk
+datasets
+scikit-learn
+torch
