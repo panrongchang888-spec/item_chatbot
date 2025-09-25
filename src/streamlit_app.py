@@ -9,7 +9,7 @@ import time
 import os
 
 BASE_DIR = os.path.dirname(__file__)
-
+print("BASE_DIR-------->", BASE_DIR)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 st.set_page_config(page_title="知能会話", layout="centered")
@@ -17,7 +17,8 @@ print("Starting the application...")
 
 # 在庫の商品
 products = []
-for i in os.listdir(f'{BASE_DIR}/data/item_original_data/'):
+#for i in os.listdir(f'{BASE_DIR}/data/item_original_data/'):
+for i in os.listdir(f'./data/item_original_data/'):
     if i.endswith('.txt') or i.endswith('.pdf'):
         products.append(i.split('.')[0])
 
@@ -44,8 +45,8 @@ if uploaded_file and uploaded_file.name.split('.')[0] not in products:
             reader = PdfReader(uploaded_file)
             text_data = "\n".join([page.extract_text() for page in reader.pages])
         # データをベクトルデータベースに書き込む
-        # data_process = DataProcess(text_data, name)
-        # data_process.run()
+        data_process = DataProcess(text_data, name)
+        data_process.run()
     st.success("ファイルが正常にアップロードされ、処理されました！")
 
 
@@ -63,7 +64,6 @@ def chat_init(product_name):
 def chat(user_input,product_name,messages, embed_model):
     # 会話歴史の変数]
     chat_init(product_name)
-
     if product_name != st.session_state['last_product_name']:
         st.session_state['messages'] = []
         st.session_state['intentions'] = []
@@ -83,34 +83,32 @@ def chat(user_input,product_name,messages, embed_model):
         st.chat_message("user").write(user_input)
         st.session_state.messages.append({"role": "user", "content": user_input})
         # ユーザーの意図を予測
-        intent_label = predict([user_input])
+        intent_label, intent_socre = predict([user_input])
         st.session_state.intentions.append(intent_label)
         context, indexs, scores = Rag_data_get(user_input,product_name, embed_model)
         print("scores--->",scores)
-        # 意図が機能相談かどうかを再確認
-        for i in scores[0]:
-            if i > 0.8:
-                intent_label = 0
-        if intent_label == 0:  # 機能相談
-            # RAGで回答生成
-            st.session_state.rag_data.append({"content":context, "index":indexs.tolist()})
-            try:
-                messages.append({"role": "user", "content":f"以下は参考内容です【{context}】。これを参考にして、ユーザーの質問に答えてください。質問：{user_input}"})
+        st.session_state.rag_data.append({"content":context, "index":indexs.tolist()})
+    
+        try:
+
+            if intent_label == 0:  # 機能相談
+                # RAGで回答生成
                 
+                messages.append({"role": "user", "content":f"以下は参考内容です【{context}】。これを参考にして、ユーザーの質問に答えてください。質問：{user_input}"})
+                    
                 answer = Chat_GLM(messages)
-               
-            except Exception as e:
-                answer = "申し訳ございません、現在モデルがオーバーロード。もう一度お試しください。"
-                print("Error :", e)
-                st.chat_message("assistant").write(answer)
-                return 
+                            
+            else: # 無間
+                messages.append({"role": "user", "content":f"以下は参考内容です【{context}】。これを参考にして、ユーザーの質問に答えてください。もし参考内容とユーザーの質問が関係ないなら、回答の内容は以下通り「申し訳ございません、私は商品に関する質問にのみ対応しています」質問：{user_input}"})
+                answer = Chat_GLM(messages)
+                #answer = '申し訳ございません、私は商品に関する質問にのみ対応しています。'
+        except Exception as e:
+                    answer = "申し訳ございません、現在モデルがオーバーロード。もう一度お試しください。"
+                    print("Error :", e)
+                    st.chat_message("assistant").write(answer)
+                    return 
         
-        elif intent_label == 1: # 雑談
-            answer = '申し訳ございません、私は商品に関する質問にのみ対応しています。'
-        
-        else: # 無間
-            answer = '申し訳ございません、私は商品に関する質問にのみ対応しています。'
-        
+        # サイドバーに意図とRAG内容を表示
         with st.sidebar:
             st.header("意図＆RAG内容")
             for idx, (intent, rag) in enumerate(zip(st.session_state.intentions, st.session_state.rag_data)):
@@ -123,7 +121,7 @@ def chat(user_input,product_name,messages, embed_model):
         
         # 回答の表示、ストリーミング
         with st.chat_message("assistant"):
-            st.write(f"user intent{label_nname[intent_label]}")
+            #st.write(f"user intent{label_nname[intent_label]}")
             placeholder = st.empty()
             text = ''
             for char in answer:
@@ -141,7 +139,6 @@ def main():
 
     embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     
-    
     st.title("🛒 商品問題助手")
 
     #conn = init_db()
@@ -153,16 +150,16 @@ def main():
             「申し訳ございません」と回答してください。"}
             ]
     
-    # 选择商品
-    
+    # 选择商品 
     product_name = st.selectbox("商品を選んでください", products)
 
     if product_name:
         #description = get_product_info(conn, product_name)
-        st.write(f"この商品について質問してください: **{product_name}**")
+        st.write(f"この商品について質問してください: **{product_name}**") # 后续可以根据商品设定特定的问题
         user_input = st.chat_input("質問：")
         print("user_input--->",user_input)
         chat(user_input,product_name,messages, embed_model)
 
 if __name__ == "__main__":
+    print(os.path.dirname(__file__))
     main()

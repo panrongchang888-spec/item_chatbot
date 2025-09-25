@@ -42,25 +42,27 @@ class DataProcess():
         out = model.encode('test')
         #print(out, out.shape)
         dimension = out.shape[0]  # all-MiniLM-L6-v2 的 embedding 维度
-        index = faiss.IndexFlatL2(dimension)
+        index = faiss.IndexFlatIP(dimension)
         for idx, i in tqdm(enumerate(text_list)):
         
             out = model.encode([i])#.shape[1]
-            # 用来存储原始文本
+            faiss.normalize_L2(out)
             index.add(np.array(out, dtype=np.float32))
+            # 用来存储原始文本
+            
             json_data.append({"index":idx,"text":i,"product":self.file_name})
         # index save
         try:
             faiss.write_index(index, f"{BASE_DIR}/data/index_data/{self.file_name}.index")
         except:
-            faiss.write_index(index, f"/tmp/{self.file_name}.index")
+            faiss.write_index(index, f"./data/{self.file_name}.index")
         print('index saved!')
         # json save
         try:
             with open(f'{BASE_DIR}/data/index_original_data/{self.file_name}.json', 'w') as f:
                 json.dump(json_data, f, ensure_ascii=False, indent=4)
         except:
-            with open(f'/tmp/{self.file_name}.json', 'w') as f:
+            with open(f'./data/{self.file_name}.json', 'w') as f:
                 json.dump(json_data, f, ensure_ascii=False, indent=4)
         print('json saved!')
    

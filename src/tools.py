@@ -46,10 +46,10 @@ def Rag_data_get(user_input,product_name, embed_model):
             index_load = faiss.read_index(f"{BASE_DIR}/data/index_data/{product_name}.index")
 
         except:
-            with open(f'/tmp/{product_name}.json', 'r') as f:
+            with open(f'./data/{product_name}.json', 'r') as f:
                 json_data = json.load(f)
             # rag用のベクトルデータベースの読み込み
-            index_load = faiss.read_index(f"/tmp/{product_name}.index")
+            index_load = faiss.read_index(f"./data/{product_name}.index")
     except FileNotFoundError:
         return "指定された商品データが見つかりません。別の商品を選択するか、商品データをアップロードしてください。", [], []
     # rag用のベクトルデータベースの読み込み
@@ -57,8 +57,14 @@ def Rag_data_get(user_input,product_name, embed_model):
     # ユーザークエリのベクトル化と類似度検索
     user_question_emb = embed_model.encode([user_input])
     # D: score, I: index
+    faiss.normalize_L2(user_question_emb)
     D, I = index_load.search(user_question_emb, k=2)
     print('I--------->',I)
     print('D--------->',D)
-    context = ''.join([json_data[i]['text'] for i in I[0]])
+    new_I = []
+    # 閾値0.8以上のものだけを抽出
+    for idx, score in enumerate(D[0]):
+        if score > 0.5:
+            new_I.append(I[0][idx])
+    context = ''.join([json_data[i]['text'] for i in new_I])
     return context, I, D

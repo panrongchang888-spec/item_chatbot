@@ -101,10 +101,12 @@ def predict(text):
   
     with torch.no_grad():
         logits = loaded_model(text)
-        print("Logits:", logits)
+        # print("intent Logits:", logits)
+        scores = torch.softmax(logits, dim=1).tolist()[0]
+        print("intent scores:", scores)
 
     pred = torch.argmax(logits, dim=1).item()
-    return pred
+    return pred, scores[pred]
 
 # test_text = ["この機械の使い方を教えてください。"]
 # print("预测结果:", predict(test_text))  # 可能输出 0 (退货)
