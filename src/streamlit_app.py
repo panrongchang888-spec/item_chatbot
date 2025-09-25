@@ -17,8 +17,8 @@ print("Starting the application...")
 
 # 在庫の商品
 products = []
-#for i in os.listdir(f'{BASE_DIR}/data/item_original_data/'):
-for i in os.listdir(f'./data/item_original_data/'):
+for i in os.listdir(f'{BASE_DIR}/data/item_original_data/'):
+#for i in os.listdir(f'./data/item_original_data/'):
     if i.endswith('.txt') or i.endswith('.pdf'):
         products.append(i.split('.')[0])
 
