@@ -4,20 +4,23 @@ from PyPDF2 import PdfReader
 from rag_data_generate import DataProcess
 from intention_train import predict
 import torch
-from tools import Chat_GLM, Rag_data_get
+from tools import Tools
 import time
 import os
+import json
+import random
 
 class MyChatbot():
     def __init__(self):
-      
+        self.tools = Tools()
         self.BASE_DIR = os.path.dirname(__file__)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.embed_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         self.label_name = ['機能相談','無間']  
         #self.products = [i.split('.')[0] for i in os.listdir(f'{self.BASE_DIR}/data/item_original_data/') if i.endswith('.txt') or i.endswith('.pdf')]
-        self.products = ['iphone17pro','switch2']
-        self.product_question = {"iphone17pro":["カメラの特徴","新たな特徴"],"switch2":["Joy-Con 2は何だ"]}
+        self.products = ['iphone17','iphone17pro','switch2']
+        #self.product_question = {"iphone17pro":["カメラの特徴","新たな特徴"],"switch2":["Joy-Con 2は何だ"]}
+    
     # 会話の初期化
     def chat_init(self,product_name):
         if 'messages' not in st.session_state:
@@ -67,6 +70,7 @@ class MyChatbot():
                 data_process.run()
             st.success("ファイルが正常にアップロードされ、処理されました！")
 
+    # サイドバーに意図とRAGデータを表示
     def st_sliderbar(self):
         with st.sidebar:
             st.header("意図&検索データ")    
@@ -77,7 +81,16 @@ class MyChatbot():
                 st.write(f"データスコア: {rag['score']}")
                 for i, line in enumerate(rag["data"].split('\n')):
                     st.write(f"検索データ {i+1}: {line}")
-
+    
+    # 会話履歴リセットボタン
+    def clean_buttion(self):
+        if st.sidebar.button("会話履歴リセット"):
+            self.chat_init_second(self.products[0])
+            st.session_state.selected = self.products[0]
+            st.sidebar.success("会話履歴がリセットされました！")
+            st.rerun()
+    
+    # チャット機能
     def chat(self,product_name, user_input, messages):
         # 会話の初期化
         self.chat_init(product_name=product_name)
@@ -98,19 +111,18 @@ class MyChatbot():
             # 意図の予測(モデルのストレス減少のため)
             intention, intent_score = predict(user_input)
             st.session_state.intentions.append({"intention": intention, "score": intent_score})
-            # RAGデータの取得
-            rag_data, rag_index, rag_score = Rag_data_get(user_input, product_name, self.embed_model)
+            # RAGデータの取得　
+            rag_data, rag_index, rag_score = self.tools.get_rag_data(user_input, product_name, self.embed_model)
             st.session_state.rag_data.append({"data": rag_data, "index": rag_index, "score": rag_score})
             # システムメッセージの作成
             try:
                 if rag_data:
                     if intention == 0: # 機能相談
                         messages.append({"role": "user", "content":f"以下は参考内容です【{rag_data}】。これを参考にして、ユーザーの質問に答えてください。質問：{user_input}"})
-                        answer = Chat_GLM(messages)
+                        answer = self.tools.GLM_chat(messages)
                     else: # 無間
-                        # 現在は
                         messages.append({"role": "user", "content":f"以下は参考内容です【{rag_data}】。これを参考にして、ユーザーの質問に答えてください。もし参考内容とユーザーの質問が関係ないなら、回答の内容は以下通り「申し訳ございません、私は商品に関する質問にのみ対応しています」質問：{user_input}"})
-                        answer = Chat_GLM(messages)
+                        answer = self.tools.GLM_chat(messages)
                         #answer = '申し訳ございません、私は商品に関する質問にのみ対応しています。'
                 else:
                     if intention == 0:
@@ -131,24 +143,28 @@ class MyChatbot():
                     placeholder.write(text) 
                     time.sleep(0.05)   
 
-        # サイドバーに意図と検索内容を表示
+            # サイドバーに意図と検索内容を表示
             self.st_sliderbar()
-
-            
             # アシスタントの回答を会話履歴に追加
             st.session_state.messages.append({"role": "assistant", "content": answer})
             messages.append({"role": "assistant", "content": answer})
 
+    # アプリの実行
     def run(self):
         print('start app...')
         st.set_page_config(page_title="RAGチャットボット", page_icon=":robot_face:")
         st.title("商品説明のチャットボット")
         self.file_upload()
+        self.clean_buttion()
         # サイドバーで商品を選択
-        product_name = st.selectbox("商品を選択", self.products)
+        product_name = st.selectbox("商品を選択", self.products, key='selected')
         if product_name:
+            product_question = json.loads(open(f'./data/question/{product_name}.json', 'r', encoding='utf-8').read())['questions']
+            print('product_question-->',product_question)
+            product_question = '\r'.join(random.sample(product_question, 3))
+            print('product_question-->',product_question)
             st.write(f"この商品について質問してください: **{product_name}**")
-            st.write(f"おそらくご質問されたい内容:**{'、'.join(self.product_question[product_name])}**")
+            st.write(f"おそらくご質問されたい内容:**\\\n{product_question}**")
         # ユーザーの入力
         user_input = st.chat_input("質問を入力してください。")
 

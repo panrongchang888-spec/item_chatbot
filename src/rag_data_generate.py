@@ -19,10 +19,10 @@ class DataProcess():
     def text_split(self):
         str_len = len(self.original_data)
         result_list = []
-        if str_len % 100 == 0:
-            block = str_len // 100
+        if str_len % self.token == 0:
+            block = str_len // self.token
         else:
-            block = str_len // 100 + 1
+            block = str_len // self.token + 1
         
         for i in range(block):
             start = i * self.token
@@ -42,7 +42,7 @@ class DataProcess():
         model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
         out = model.encode('test')
         #print(out, out.shape)
-        dimension = out.shape[0]  # all-MiniLM-L6-v2 的 embedding 维度
+        dimension = out.shape[0]  # all-MiniLM-L6-v2 の　embedding 次元数
         index = faiss.IndexFlatIP(dimension)
         for idx, i in tqdm(enumerate(text_list)):
         
@@ -70,3 +70,10 @@ class DataProcess():
         text_list = self.text_split()
         self.embedding_process(text_list)
       
+if __name__ == "__main__":
+    # すべてのファイルを処理
+    for file in os.listdir('./data/item_original_data/'):
+        with open(f'./data/item_original_data/{file}', 'r', encoding='utf-8') as f:
+            text_data = f.read()
+        data_process = DataProcess(text_data, file.split('.')[0],token=200)
+        data_process.run()

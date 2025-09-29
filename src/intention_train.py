@@ -6,6 +6,7 @@ import json
 from tqdm import *
 from sklearn.metrics import classification_report
 import os
+import pandas as pd
 
 BASE_DIR = os.path.dirname(__file__)
 #print("Preparing data...")
@@ -14,22 +15,24 @@ BASE_DIR = os.path.dirname(__file__)
 label_name = ['機能相談','無間']
 # 准备数据
 def data_prepare(train_batch_size=10, valid_batch_size=1):
-    texts = []
-    labels = []
+    # texts = []
+    # labels = []
 
-    with open('japanese_dataset_clean.json', 'r', encoding='utf-8') as f:
-        original_data = json.load(f)
-    for idx, i in enumerate(original_data):
-        texts.extend(i['examples'])
-        labels.extend([idx]*len(i['examples']))
-
+    # with open('japanese_dataset_clean.json', 'r', encoding='utf-8') as f:
+    #     original_data = json.load(f)
+    # for idx, i in enumerate(original_data):
+    #     texts.extend(i['examples'])
+    #     labels.extend([idx]*len(i['examples']))
+    data = pd.read_csv('./data/intention_train_data/train_data.csv')
+    texts = data['question'].tolist()
+    labels = data['label'].tolist()
     print(texts)
     print(labels)
 
-    # 转成 HuggingFace Dataset
+    #  HuggingFace Dataset
     dataset = Dataset.from_dict({'text': texts, 'label': labels})
 
-    # 划分训练/验证集
+    # データセットをトレーニングセットと検証セットに分割
     dataset = dataset.train_test_split(test_size=0.2)
     
     train_loader = torch.utils.data.DataLoader(dataset["train"], batch_size=train_batch_size, shuffle=True)
@@ -58,7 +61,7 @@ def train(train_loader, valid_loader):
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=2e-3)
 
-    for epoch in tqdm(range(10)):  # 演示只跑2个epoch
+    for epoch in tqdm(range(50)):  # エポック数
         
         for batch in train_loader:
             text_list = batch["text"]
@@ -112,11 +115,11 @@ def predict(text):
 # print("预测结果:", predict(test_text))  # 可能输出 0 (退货)
 
 if __name__ == "__main__":
-    train_loader, valid_loader = data_prepare(train_batch_size=10, valid_batch_size=1)
+    train_loader, valid_loader = data_prepare(train_batch_size=20, valid_batch_size=1)
     train(train_loader=train_loader, valid_loader=valid_loader)
 
-    text1 = 'この機械の使い方を教えてください。'
+    text1 = '特徴は何ですか？'
     text2 = 'こんにちは、元気ですか？'
-    print("预测结果:", predict([text1]))  
-    print("预测结果:", predict([text2]))  
+    print("预测结果:", predict(text1))  
+    print("预测结果:", predict(text2))  
     
