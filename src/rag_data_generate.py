@@ -15,6 +15,7 @@ class DataProcess():
         self.json_data = []
         self.file_name = name
 
+    # テキストを分割
     def text_split(self):
         str_len = len(self.original_data)
         result_list = []
@@ -32,10 +33,10 @@ class DataProcess():
             print(f'block {i+1}: from {start} to {end}')
             print(self.original_data[start:end])
             result_list.append(self.original_data[start:end])
-        # 返回分块后的文本列表
+    
         return result_list
     
-
+    #　ベクトル化と索引保存
     def embedding_process(self, text_list):
         json_data = []
         model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -46,10 +47,9 @@ class DataProcess():
         for idx, i in tqdm(enumerate(text_list)):
         
             out = model.encode([i])#.shape[1]
-            faiss.normalize_L2(out)
+            #out = faiss.normalize_L2(out)
             index.add(np.array(out, dtype=np.float32))
-            # 用来存储原始文本
-            
+            # オリジナルデータ保存
             json_data.append({"index":idx,"text":i,"product":self.file_name})
         # index save
         try:

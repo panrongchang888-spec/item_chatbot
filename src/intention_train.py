@@ -8,12 +8,12 @@ from sklearn.metrics import classification_report
 import os
 
 BASE_DIR = os.path.dirname(__file__)
-print("Preparing data...")
+#print("Preparing data...")
 # all-MiniLM-L6-v2
 # sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 label_name = ['機能相談','無間']
 # 准备数据
-def data_prepare():
+def data_prepare(train_batch_size=10, valid_batch_size=1):
     texts = []
     labels = []
 
@@ -31,9 +31,9 @@ def data_prepare():
 
     # 划分训练/验证集
     dataset = dataset.train_test_split(test_size=0.2)
-
-    train_loader = torch.utils.data.DataLoader(dataset["train"], batch_size=10, shuffle=True)
-    valid_loader = torch.utils.data.DataLoader(dataset["test"], batch_size=1)
+    
+    train_loader = torch.utils.data.DataLoader(dataset["train"], batch_size=train_batch_size, shuffle=True)
+    valid_loader = torch.utils.data.DataLoader(dataset["test"], batch_size=valid_batch_size, shuffle=False)
     return train_loader, valid_loader
 
 # モデル定義
@@ -101,18 +101,18 @@ def predict(text):
   
     with torch.no_grad():
         logits = loaded_model(text)
-        # print("intent Logits:", logits)
-        scores = torch.softmax(logits, dim=1).tolist()[0]
+        print("intent Logits:", logits)
+        scores = torch.softmax(logits,dim=-1).tolist()
         print("intent scores:", scores)
 
-    pred = torch.argmax(logits, dim=1).item()
+    pred = torch.argmax(logits, dim=-1).item()
     return pred, scores[pred]
 
 # test_text = ["この機械の使い方を教えてください。"]
 # print("预测结果:", predict(test_text))  # 可能输出 0 (退货)
 
 if __name__ == "__main__":
-    train_loader, valid_loader = data_prepare()
+    train_loader, valid_loader = data_prepare(train_batch_size=10, valid_batch_size=1)
     train(train_loader=train_loader, valid_loader=valid_loader)
 
     text1 = 'この機械の使い方を教えてください。'

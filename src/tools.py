@@ -15,11 +15,11 @@ def Chat_GLM(messages):
         model="glm-4.5-air",
         messages=messages,
         thinking={
-            "type": "false",    # 启用深度思考模式
+            "type": "false",    # 思考モジュール
         },
         stream=False,
-        max_tokens=4096,          # 最大输出 tokens
-        temperature=0.6           # 控制输出的随机性
+        max_tokens=4096,          # 最大 tokens
+        temperature=0.6           # ランダム性調整
     )
 
     response = response.choices[0].message.content
@@ -50,17 +50,18 @@ def Rag_data_get(user_input,product_name, embed_model):
     # ユーザークエリのベクトル化と類似度検索
     user_question_emb = embed_model.encode([user_input])
     # D: score, I: index
-    faiss.normalize_L2(user_question_emb)
-    D, I = index_load.search(user_question_emb, k=2)
+    #faiss.normalize_L2(user_question_emb)
+    D, I = index_load.search(user_question_emb, k=5)
     print('I--------->',I)
     print('D--------->',D)
     new_I = []
-
-    # 閾値0.5以上のものだけを抽出
+    new_D = []
+    # 閾値0.４以上のものだけを抽出
     for idx, score in enumerate(D[0]):
-        if score > 0.5:
+        if score > 0.4:
             new_I.append(I[0][idx])
+            new_D.append(D[0][idx])
 
     context = ''.join([json_data[i]['text'] for i in new_I])
 
-    return context, I, D
+    return context, new_I, new_D
