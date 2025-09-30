@@ -159,10 +159,10 @@ class MyChatbot():
         # サイドバーで商品を選択
         product_name = st.selectbox("商品を選択", self.products, key='selected')
         if product_name:
-            product_question = json.loads(open(f'./data/question/{product_name}.json', 'r', encoding='utf-8').read())['questions']
-            print('product_question-->',product_question)
+            product_question = json.loads(open(f'{self.BASE_DIR}/data/question/{product_name}.json', 'r', encoding='utf-8').read())['questions']
+            #print('product_question-->',product_question)
             product_question = '\r'.join(random.sample(product_question, 3))
-            print('product_question-->',product_question)
+            #print('product_question-->',product_question)
             st.write(f"この商品について質問してください: **{product_name}**")
             st.write(f"おそらくご質問されたい内容:**\\\n{product_question}**")
         # ユーザーの入力
