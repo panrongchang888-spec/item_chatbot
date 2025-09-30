@@ -51,6 +51,8 @@ short_description: product assistant
 
 
 ## 実行方法
+hugging　face space上で実際に試すことができます
+https://huggingface.co/spaces/Free-p/ai-project 
 
 ローカル環境での実行
 1.	ChatGLM の API キーを取得する
@@ -59,13 +61,4 @@ short_description: product assistant
 
 streamlit run streamlit_app.py
 
-
-
-## 今後の改善方針
-
-1.	より適切な元データの分割方法を検討
-2.	新しいモジュールの追加
-	•	商品推薦
-	•	アフターサービス関連のサポート
-3.	自前のデプロイ環境が整った場合、大規模モデルAPIを自前モデルに置き換え
 

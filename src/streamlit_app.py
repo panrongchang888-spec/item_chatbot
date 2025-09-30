@@ -17,8 +17,8 @@ class MyChatbot():
         #self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.embed_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         self.label_name = ['機能相談','無間']  
-        #self.products = [i.split('.')[0] for i in os.listdir(f'{self.BASE_DIR}/data/item_original_data/') if i.endswith('.txt') or i.endswith('.pdf')]
-        self.products = ['iphone17','iphone17pro','switch2']
+        self.products = [i.split('.')[0] for i in os.listdir(f'{self.BASE_DIR}/data/item_original_data/') if i.endswith('.txt') or i.endswith('.pdf')]
+        #self.products = ['iphone17','iphone17pro','switch2']
         #self.product_question = {"iphone17pro":["カメラの特徴","新たな特徴"],"switch2":["Joy-Con 2は何だ"]}
     
     # 会話の初期化
@@ -154,14 +154,20 @@ class MyChatbot():
         print('start app...')
         st.set_page_config(page_title="RAGチャットボット", page_icon=":robot_face:")
         st.title("商品説明のチャットボット")
+        # ファイルアップロード
         self.file_upload()
+        # 会話履歴リセットボタン
         self.clean_buttion()
         # サイドバーで商品を選択
         product_name = st.selectbox("商品を選択", self.products, key='selected')
         if product_name:
-            product_question = json.loads(open(f'{self.BASE_DIR}/data/question/{product_name}.json', 'r', encoding='utf-8').read())['questions']
+            try:
+                product_question = json.loads(open(f'{self.BASE_DIR}/data/question/{product_name}.json', 'r', encoding='utf-8').read())['questions']
+                product_question = '\r'.join(random.sample(product_question, 3))
+            except:
+                product_question = []
             #print('product_question-->',product_question)
-            product_question = '\r'.join(random.sample(product_question, 3))
+            
             #print('product_question-->',product_question)
             st.write(f"この商品について質問してください: **{product_name}**")
             st.write(f"おそらくご質問されたい内容:**\\\n{product_question}**")
