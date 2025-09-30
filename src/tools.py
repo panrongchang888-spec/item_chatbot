@@ -6,7 +6,7 @@ import os
 
 
 BASE_DIR = os.path.dirname(__file__)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 api_key = os.environ.get('GLM_API_KEY')
 client = ZhipuAiClient(api_key=api_key)  # API Key
 

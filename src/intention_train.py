@@ -13,16 +13,9 @@ BASE_DIR = os.path.dirname(__file__)
 # all-MiniLM-L6-v2
 # sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 label_name = ['機能相談','無間']
-# 准备数据
+# データ準備
 def data_prepare(train_batch_size=10, valid_batch_size=1):
-    # texts = []
-    # labels = []
 
-    # with open('japanese_dataset_clean.json', 'r', encoding='utf-8') as f:
-    #     original_data = json.load(f)
-    # for idx, i in enumerate(original_data):
-    #     texts.extend(i['examples'])
-    #     labels.extend([idx]*len(i['examples']))
     data = pd.read_csv('./data/intention_train_data/train_data.csv')
     texts = data['question'].tolist()
     labels = data['label'].tolist()
@@ -75,9 +68,10 @@ def train(train_loader, valid_loader):
 
         print(f"Epoch {epoch+1}, Loss: {loss.item()}")
     
-    # 验证集的准确度
+    # 検証
     preds = [] # 予測値
     labels = [] # 正解値
+    model.eval()
     for batch in valid_loader:
         text_list = batch["text"]
         label_list = batch["label"]
@@ -88,15 +82,12 @@ def train(train_loader, valid_loader):
 
     print(classification_report(labels, preds, target_names=label_name))
 
-    # ========== 5. 保存模型 ==========
+    # モデル保存
     torch.save(model.state_dict(), "intent_model.pt")
     print("模型已保存。")
 
 
-# ========== 6. 加载模型并预测 ==========
-# 加载
-
-# 预测
+# 予測
 def predict(text):
     loaded_model = IntentClassifier()
     loaded_model.load_state_dict(torch.load(f"{BASE_DIR}/intent_model.pt", map_location=device))

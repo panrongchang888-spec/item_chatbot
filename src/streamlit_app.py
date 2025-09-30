@@ -14,8 +14,8 @@ class MyChatbot():
     def __init__(self):
         self.tools = Tools()
         self.BASE_DIR = os.path.dirname(__file__)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.embed_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        #self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.embed_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='auto')
         self.label_name = ['機能相談','無間']  
         #self.products = [i.split('.')[0] for i in os.listdir(f'{self.BASE_DIR}/data/item_original_data/') if i.endswith('.txt') or i.endswith('.pdf')]
         self.products = ['iphone17','iphone17pro','switch2']
